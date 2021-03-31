@@ -5,6 +5,12 @@ import (
 	"github.com/yuricampolongo/microservices-rest-golang/mvc/utils"
 )
 
-func GetUser(userId int64) (*domain.User, *utils.ApplicationError) {
-	return domain.GetUser(userId)
+type userServices struct{}
+
+var (
+	UserServices userServices
+)
+
+func (t *userServices) GetUser(userId int64) (*domain.User, *utils.ApplicationError) {
+	return domain.UserDao.GetUser(userId)
 }
