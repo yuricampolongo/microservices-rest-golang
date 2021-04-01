@@ -18,15 +18,15 @@ func GetUser(c *gin.Context) {
 			Code:    "bad_request",
 		}
 
-		c.JSON(apiErr.Status, apiErr)
+		utils.RespondError(c, apiErr)
 		return
 	}
 
 	user, apiErr := services.UserServices.GetUser(userId)
 	if apiErr != nil {
-		c.JSON(apiErr.Status, apiErr)
+		utils.RespondError(c, apiErr)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.Respond(c, http.StatusOK, user)
 }
