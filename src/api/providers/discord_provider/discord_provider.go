@@ -23,7 +23,7 @@ func SendMessage(message discord.DiscordMessage) (*discord.DiscordMessageRespons
 	if err != nil {
 		return nil, &discord.DiscordErrorResponse{
 			Code:    http.StatusInternalServerError,
-			Message: "error to send message to channel",
+			Message: err.Error(),
 		}
 	}
 
@@ -47,13 +47,7 @@ func SendMessage(message discord.DiscordMessage) (*discord.DiscordMessageRespons
 		return nil, &errResponse
 	}
 
-	var result discord.DiscordMessageResponse
-	if err := json.Unmarshal(bytes, &result); err != nil {
-		return nil, &discord.DiscordErrorResponse{
-			Code:    http.StatusInternalServerError,
-			Message: "invalid json response body",
-		}
-	}
-
-	return &result, nil
+	return &discord.DiscordMessageResponse{
+		Code: response.StatusCode,
+	}, nil
 }
