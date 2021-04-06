@@ -55,6 +55,7 @@ func Post(url string, body interface{}) (*http.Response, error) {
 	}
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(jsonBytes))
+	request.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{}
 	return client.Do(request)
