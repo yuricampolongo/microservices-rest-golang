@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/yuricampolongo/microservices-rest-golang/src/api/clients/restclient"
+	"github.com/yuricampolongo/microservices-rest-golang/src/api/clients/rest"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/discord"
 )
 
@@ -14,14 +14,14 @@ const (
 	// so please, do not use this endpoint for spam or other purposes use only for studies and research.
 	// If I begin to receive spams in my discord, I'll disable this endpoint and you have to create one on your own.
 	// If you want to see the results you can join the discord server: https://discord.gg/kH8k5TDWd4 and check the channel #message-test
-	urlSendMessage            = "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH"
-	discordSucessResponseCode = 204
+	urlSendMessage     = "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH"
+	sucessResponseCode = 204
 )
 
-func SendMessage(message discord.DiscordMessage) (*discord.DiscordMessageResponse, *discord.DiscordErrorResponse) {
-	response, err := restclient.Post(urlSendMessage, message)
+func SendMessage(message discord.Message) (*discord.MessageResponse, *discord.ErrorResponse) {
+	response, err := rest.Post(urlSendMessage, message)
 	if err != nil {
-		return nil, &discord.DiscordErrorResponse{
+		return nil, &discord.ErrorResponse{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
@@ -29,17 +29,17 @@ func SendMessage(message discord.DiscordMessage) (*discord.DiscordMessageRespons
 
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, &discord.DiscordErrorResponse{
+		return nil, &discord.ErrorResponse{
 			Code:    http.StatusInternalServerError,
 			Message: "invalid body",
 		}
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != discordSucessResponseCode {
-		var errResponse discord.DiscordErrorResponse
+	if response.StatusCode != sucessResponseCode {
+		var errResponse discord.ErrorResponse
 		if err := json.Unmarshal(bytes, &errResponse); err != nil {
-			return nil, &discord.DiscordErrorResponse{
+			return nil, &discord.ErrorResponse{
 				Code:    http.StatusInternalServerError,
 				Message: "invalid json error response body",
 			}
@@ -47,7 +47,7 @@ func SendMessage(message discord.DiscordMessage) (*discord.DiscordMessageRespons
 		return nil, &errResponse
 	}
 
-	return &discord.DiscordMessageResponse{
+	return &discord.MessageResponse{
 		Code: response.StatusCode,
 	}, nil
 }

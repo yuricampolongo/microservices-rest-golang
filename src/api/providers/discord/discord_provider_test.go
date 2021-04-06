@@ -8,26 +8,30 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yuricampolongo/microservices-rest-golang/src/api/clients/restclient"
+	"github.com/yuricampolongo/microservices-rest-golang/src/api/clients/rest"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/discord"
 
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	sendMessageUrl = "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH"
+)
+
 func TestMain(m *testing.M) {
-	restclient.StartMockups()
+	rest.StartMockups()
 	os.Exit(m.Run())
 }
 
 func TestSendMessageErrorClient(t *testing.T) {
-	restclient.FlushMockups()
-	restclient.AddMockup(restclient.Mock{
-		Url:        "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH",
+	rest.FlushMockups()
+	rest.AddMockup(rest.Mock{
+		Url:        sendMessageUrl,
 		HttpMethod: http.MethodPost,
 		Err:        errors.New("error to send message to channel"),
 	})
 
-	response, err := SendMessage(discord.DiscordMessage{})
+	response, err := SendMessage(discord.Message{})
 
 	assert.Nil(t, response)
 	assert.NotNil(t, err)
@@ -36,10 +40,10 @@ func TestSendMessageErrorClient(t *testing.T) {
 }
 
 func TestSendMessageErrorInvalidResponseBody(t *testing.T) {
-	restclient.FlushMockups()
+	rest.FlushMockups()
 	invalidCloser, _ := os.Open("1454-555")
-	restclient.AddMockup(restclient.Mock{
-		Url:        "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH",
+	rest.AddMockup(rest.Mock{
+		Url:        sendMessageUrl,
 		HttpMethod: http.MethodPost,
 		Response: &http.Response{
 			StatusCode: http.StatusNoContent,
@@ -47,7 +51,7 @@ func TestSendMessageErrorInvalidResponseBody(t *testing.T) {
 		},
 	})
 
-	response, err := SendMessage(discord.DiscordMessage{})
+	response, err := SendMessage(discord.Message{})
 
 	assert.Nil(t, response)
 	assert.NotNil(t, err)
@@ -56,9 +60,9 @@ func TestSendMessageErrorInvalidResponseBody(t *testing.T) {
 }
 
 func TestSendMessageErrorInvalidErrorResponseBody(t *testing.T) {
-	restclient.FlushMockups()
-	restclient.AddMockup(restclient.Mock{
-		Url:        "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH",
+	rest.FlushMockups()
+	rest.AddMockup(rest.Mock{
+		Url:        sendMessageUrl,
 		HttpMethod: http.MethodPost,
 		Response: &http.Response{
 			StatusCode: http.StatusBadRequest,
@@ -66,7 +70,7 @@ func TestSendMessageErrorInvalidErrorResponseBody(t *testing.T) {
 		},
 	})
 
-	response, err := SendMessage(discord.DiscordMessage{})
+	response, err := SendMessage(discord.Message{})
 
 	assert.Nil(t, response)
 	assert.NotNil(t, err)
@@ -75,9 +79,9 @@ func TestSendMessageErrorInvalidErrorResponseBody(t *testing.T) {
 }
 
 func TestSendMessageErrorInvalidRequest(t *testing.T) {
-	restclient.FlushMockups()
-	restclient.AddMockup(restclient.Mock{
-		Url:        "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH",
+	rest.FlushMockups()
+	rest.AddMockup(rest.Mock{
+		Url:        sendMessageUrl,
 		HttpMethod: http.MethodPost,
 		Response: &http.Response{
 			StatusCode: http.StatusBadRequest,
@@ -85,7 +89,7 @@ func TestSendMessageErrorInvalidRequest(t *testing.T) {
 		},
 	})
 
-	response, err := SendMessage(discord.DiscordMessage{})
+	response, err := SendMessage(discord.Message{})
 
 	assert.Nil(t, response)
 	assert.NotNil(t, err)
@@ -94,9 +98,9 @@ func TestSendMessageErrorInvalidRequest(t *testing.T) {
 }
 
 func TestSendMessage(t *testing.T) {
-	restclient.FlushMockups()
-	restclient.AddMockup(restclient.Mock{
-		Url:        "https://discord.com/api/webhooks/827375998764449832/aQugmbNMF229HqYNKVcFMKIU6PqrJgkSJ3Zd17fs-46Z2nAJzT_wcWgnEjCdonkBwkYH",
+	rest.FlushMockups()
+	rest.AddMockup(rest.Mock{
+		Url:        sendMessageUrl,
 		HttpMethod: http.MethodPost,
 		Response: &http.Response{
 			StatusCode: http.StatusNoContent,
@@ -104,7 +108,7 @@ func TestSendMessage(t *testing.T) {
 		},
 	})
 
-	response, err := SendMessage(discord.DiscordMessage{})
+	response, err := SendMessage(discord.Message{})
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)

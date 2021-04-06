@@ -1,6 +1,6 @@
 package discord
 
-type DiscordErrorResponse struct {
+type ErrorResponse struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
 }

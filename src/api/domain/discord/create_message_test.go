@@ -8,7 +8,7 @@ import (
 )
 
 func TestDiscordMessageRequestAsJson(t *testing.T) {
-	request := DiscordMessage{
+	request := Message{
 		Content: "test message golang api",
 		Tts:     false,
 		Embed: EmbedMessage{
@@ -21,7 +21,7 @@ func TestDiscordMessageRequestAsJson(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, bytes)
 
-	var target DiscordMessage
+	var target Message
 
 	err = json.Unmarshal(bytes, &target)
 	assert.Nil(t, err)

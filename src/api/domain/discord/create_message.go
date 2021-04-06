@@ -1,6 +1,6 @@
 package discord
 
-type DiscordMessage struct {
+type Message struct {
 	Content string       `json:"content"`
 	Tts     bool         `json:"tts"`
 	Embed   EmbedMessage `json:"embed"`
@@ -11,6 +11,6 @@ type EmbedMessage struct {
 	Description string `json:"description"`
 }
 
-type DiscordMessageResponse struct {
+type MessageResponse struct {
 	Code int `json:"code"`
 }
