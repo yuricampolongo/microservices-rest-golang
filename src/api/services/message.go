@@ -1,16 +1,16 @@
 package services
 
 import (
+	"github.com/yuricampolongo/microservices-rest-golang/src/api/api_errors"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/discord"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/messages"
-	"github.com/yuricampolongo/microservices-rest-golang/src/api/errors"
-	discord_provider "github.com/yuricampolongo/microservices-rest-golang/src/api/providers/discord"
+	"github.com/yuricampolongo/microservices-rest-golang/src/api/providers/discord_provider"
 )
 
 type messageService struct{}
 
 type messageServiceInterface interface {
-	SendMessage(input messages.MessageRequest) (*messages.MessageResponse, errors.ApiError)
+	SendMessage(input messages.MessageRequest) (*messages.MessageResponse, api_errors.ApiError)
 }
 
 var (
@@ -21,7 +21,7 @@ func init() {
 	MessageService = &messageService{}
 }
 
-func (s *messageService) SendMessage(input messages.MessageRequest) (*messages.MessageResponse, errors.ApiError) {
+func (s *messageService) SendMessage(input messages.MessageRequest) (*messages.MessageResponse, api_errors.ApiError) {
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *messageService) SendMessage(input messages.MessageRequest) (*messages.M
 
 	response, err := discord_provider.SendMessage(request)
 	if err != nil {
-		return nil, errors.NewApiError(err.Code, err.Message)
+		return nil, api_errors.NewApiError(err.Code, err.Message)
 	}
 
 	result := messages.MessageResponse{
