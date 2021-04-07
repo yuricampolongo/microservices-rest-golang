@@ -11,10 +11,6 @@ func TestDiscordMessageRequestAsJson(t *testing.T) {
 	request := Message{
 		Content: "test message golang api",
 		Tts:     false,
-		Embed: EmbedMessage{
-			Title:       "Test message golang embed",
-			Description: "this is an embed message",
-		},
 	}
 
 	bytes, err := json.Marshal(request)

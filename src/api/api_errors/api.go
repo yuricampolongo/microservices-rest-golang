@@ -9,13 +9,11 @@ import (
 type ApiError interface {
 	Status() int
 	Message() string
-	Error() string
 }
 
 type apiError struct {
 	AStatus  int    `json:"status"`
 	AMessage string `json:"message"`
-	AnError  string `json:"error,omitempty"`
 }
 
 func (e *apiError) Status() int {
@@ -24,10 +22,6 @@ func (e *apiError) Status() int {
 
 func (e *apiError) Message() string {
 	return e.AMessage
-}
-
-func (e *apiError) Error() string {
-	return e.AnError
 }
 
 func NewApiError(statusCode int, message string) ApiError {
