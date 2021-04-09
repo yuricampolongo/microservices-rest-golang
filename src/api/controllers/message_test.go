@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestSendMessageInvalidBody(t *testing.T) {
-	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(``))
+	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(`{}`))
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
@@ -44,22 +44,22 @@ func TestSendMessageApiError(t *testing.T) {
 		HttpMethod: http.MethodPost,
 		Response: &http.Response{
 			StatusCode: http.StatusBadRequest,
-			Body:       ioutil.NopCloser(strings.NewReader(`{"message": "Invalid request","code": 50000}`)),
+			Body:       ioutil.NopCloser(strings.NewReader(`[{"content": "","code": 50000}]`)),
 		},
 	})
 
-	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(`{"content":"message testing"}`))
+	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(`[{"content":"message testing"}]`))
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
 	SendMessages(c)
 
-	assert.EqualValues(t, 50000, response.Code)
-	apiErr, err := api_errors.NewApiErrFromBytes(response.Body.Bytes())
+	assert.EqualValues(t, 201, response.Code)
+	var msgReq []messages.MessageRequest
+	err := json.Unmarshal(response.Body.Bytes(), &msgReq)
 	assert.Nil(t, err)
-	assert.NotNil(t, apiErr)
-	assert.EqualValues(t, 50000, apiErr.Status())
-	assert.EqualValues(t, "Invalid request", apiErr.Message())
+	assert.NotNil(t, msgReq)
+	assert.Empty(t, msgReq[0].Content)
 }
 
 func TestSendMessage(t *testing.T) {
@@ -73,14 +73,14 @@ func TestSendMessage(t *testing.T) {
 		},
 	})
 
-	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(`{"content":"message testing"}`))
+	request, _ := http.NewRequest(http.MethodPost, "/repositories", strings.NewReader(`[{"content":"message testing"}]`))
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
 	SendMessages(c)
 
-	var result messages.MessageResponse
+	var result []messages.MessageResponse
 	err := json.Unmarshal(response.Body.Bytes(), &result)
 	assert.Nil(t, err)
-	assert.EqualValues(t, http.StatusNoContent, result.Code)
+	assert.EqualValues(t, http.StatusNoContent, result[0].Code)
 }
