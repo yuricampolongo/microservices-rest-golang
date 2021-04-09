@@ -17,10 +17,6 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.15
-        
-    - name: init
-      working-directory: ./src
-      run: go mod init
 
     - name: Packages
       working-directory: ./src
