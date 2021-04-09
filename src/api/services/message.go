@@ -30,11 +30,11 @@ func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.Messa
 	defer close(output)
 
 	var wg sync.WaitGroup
-	go handleMessageSendResult(&wg, input, output)
+	go s.handleMessageSendResult(&wg, input, output)
 
 	for _, m := range msgs {
 		wg.Add(1)
-		go handleMessageSend(m, input)
+		go s.handleMessageSend(m, input)
 	}
 
 	wg.Wait()
@@ -46,7 +46,7 @@ func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.Messa
 
 }
 
-func handleMessageSendResult(wg *sync.WaitGroup, input chan messages.MessageSendResult, output chan []messages.MessageResponse) {
+func (s *messageService) handleMessageSendResult(wg *sync.WaitGroup, input chan messages.MessageSendResult, output chan []messages.MessageResponse) {
 	var results []messages.MessageResponse
 	for ev := range input {
 		if ev.Error != nil {
@@ -68,7 +68,7 @@ func handleMessageSendResult(wg *sync.WaitGroup, input chan messages.MessageSend
 	output <- results
 }
 
-func handleMessageSend(input messages.MessageRequest, output chan messages.MessageSendResult) {
+func (s *messageService) handleMessageSend(input messages.MessageRequest, output chan messages.MessageSendResult) {
 	if err := input.Validate(); err != nil {
 		output <- messages.MessageSendResult{Error: err}
 		return

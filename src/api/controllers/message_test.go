@@ -27,7 +27,7 @@ func TestSendMessageInvalidBody(t *testing.T) {
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
-	SendMessage(c)
+	SendMessages(c)
 
 	assert.EqualValues(t, http.StatusBadRequest, response.Code)
 	apiErr, err := api_errors.NewApiErrFromBytes(response.Body.Bytes())
@@ -52,7 +52,7 @@ func TestSendMessageApiError(t *testing.T) {
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
-	SendMessage(c)
+	SendMessages(c)
 
 	assert.EqualValues(t, 50000, response.Code)
 	apiErr, err := api_errors.NewApiErrFromBytes(response.Body.Bytes())
@@ -77,7 +77,7 @@ func TestSendMessage(t *testing.T) {
 	response := httptest.NewRecorder()
 	c := test.GetMockedContext(request, response)
 
-	SendMessage(c)
+	SendMessages(c)
 
 	var result messages.MessageResponse
 	err := json.Unmarshal(response.Body.Bytes(), &result)
