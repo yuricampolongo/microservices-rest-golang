@@ -5,5 +5,5 @@ import (
 )
 
 func mapUrls() {
-	router.POST("/message", controllers.SendMessage)
+	router.POST("/messages", controllers.SendMessages)
 }

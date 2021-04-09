@@ -19,5 +19,11 @@ func (r *MessageRequest) Validate() api_errors.ApiError {
 }
 
 type MessageResponse struct {
-	Code int `json:"code"`
+	Content string `json:"content"`
+	Code    int    `json:"code"`
+}
+
+type MessageSendResult struct {
+	Response *MessageResponse    `json:"response"`
+	Error    api_errors.ApiError `json:"error"`
 }

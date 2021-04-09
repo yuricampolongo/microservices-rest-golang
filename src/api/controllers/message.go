@@ -9,15 +9,15 @@ import (
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/services"
 )
 
-func SendMessage(c *gin.Context) {
-	var request messages.MessageRequest
+func SendMessages(c *gin.Context) {
+	var request []messages.MessageRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		apiErr := api_errors.NewBadRequestError("invalid json body")
 		c.JSON(apiErr.Status(), apiErr)
 		return
 	}
 
-	result, err := services.MessageService.SendMessage(request)
+	result, err := services.Message.Send(request)
 	if err != nil {
 		c.JSON(err.Status(), err)
 		return
