@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -73,7 +72,6 @@ func (s *messageService) handleMessageSendResult(wg *sync.WaitGroup, input chan 
 
 func (s *messageService) handleMessageSend(input messages.MessageRequest, output chan messages.MessageSendResult, buffer chan bool) {
 	if err := input.Validate(); err != nil {
-		fmt.Println(err)
 		output <- messages.MessageSendResult{Error: err}
 		return
 	}
@@ -84,7 +82,6 @@ func (s *messageService) handleMessageSend(input messages.MessageRequest, output
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		output <- messages.MessageSendResult{Error: api_errors.NewApiError(err.Code, err.Message)}
 		return
 	}
