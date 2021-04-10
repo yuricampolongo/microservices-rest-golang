@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -27,14 +28,16 @@ func init() {
 func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.MessageResponse, api_errors.ApiError) {
 	input := make(chan messages.MessageSendResult)
 	output := make(chan []messages.MessageResponse)
+	buffer := make(chan bool, 5)
 	defer close(output)
 
 	var wg sync.WaitGroup
 	go s.handleMessageSendResult(&wg, input, output)
 
 	for _, m := range msgs {
+		buffer <- true
 		wg.Add(1)
-		go s.handleMessageSend(m, input)
+		go s.handleMessageSend(m, input, buffer)
 	}
 
 	wg.Wait()
@@ -68,8 +71,9 @@ func (s *messageService) handleMessageSendResult(wg *sync.WaitGroup, input chan 
 	output <- results
 }
 
-func (s *messageService) handleMessageSend(input messages.MessageRequest, output chan messages.MessageSendResult) {
+func (s *messageService) handleMessageSend(input messages.MessageRequest, output chan messages.MessageSendResult, buffer chan bool) {
 	if err := input.Validate(); err != nil {
+		fmt.Println(err)
 		output <- messages.MessageSendResult{Error: err}
 		return
 	}
@@ -80,6 +84,7 @@ func (s *messageService) handleMessageSend(input messages.MessageRequest, output
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		output <- messages.MessageSendResult{Error: api_errors.NewApiError(err.Code, err.Message)}
 		return
 	}
@@ -90,4 +95,6 @@ func (s *messageService) handleMessageSend(input messages.MessageRequest, output
 			Content: input.Content,
 		},
 	}
+
+	<-buffer
 }

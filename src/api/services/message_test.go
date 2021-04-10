@@ -78,7 +78,8 @@ func TestHandleMessageSendInvalidRequest(t *testing.T) {
 	input := messages.MessageRequest{}
 	service := messageService{}
 	output := make(chan messages.MessageSendResult)
-	go service.handleMessageSend(input, output)
+	buffer := make(chan bool, 5)
+	go service.handleMessageSend(input, output, buffer)
 
 	response := <-output
 
@@ -102,7 +103,8 @@ func TestHandleMessageSendDiscordError(t *testing.T) {
 
 	service := messageService{}
 	output := make(chan messages.MessageSendResult)
-	go service.handleMessageSend(request, output)
+	buffer := make(chan bool, 5)
+	go service.handleMessageSend(request, output, buffer)
 
 	response := <-output
 
@@ -129,7 +131,8 @@ func TestHandleMessage(t *testing.T) {
 
 	service := messageService{}
 	output := make(chan messages.MessageSendResult)
-	go service.handleMessageSend(request, output)
+	buffer := make(chan bool, 5)
+	go service.handleMessageSend(request, output, buffer)
 
 	response := <-output
 
