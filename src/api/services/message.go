@@ -1,12 +1,14 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/api_errors"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/discord"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/domain/messages"
+	"github.com/yuricampolongo/microservices-rest-golang/src/api/log"
 	"github.com/yuricampolongo/microservices-rest-golang/src/api/providers/discord_provider"
 )
 
@@ -25,6 +27,9 @@ func init() {
 }
 
 func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.MessageResponse, api_errors.ApiError) {
+	log.Info("Sending messages")
+	log.Debug(fmt.Sprintf("%+q", msgs))
+
 	input := make(chan messages.MessageSendResult)
 	output := make(chan []messages.MessageResponse)
 	buffer := make(chan bool, 5)
@@ -34,6 +39,7 @@ func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.Messa
 	go s.handleMessageSendResult(&wg, input, output)
 
 	for _, m := range msgs {
+		log.Info(fmt.Sprintf("Message %s", m))
 		buffer <- true
 		wg.Add(1)
 		go s.handleMessageSend(m, input, buffer)
@@ -43,6 +49,10 @@ func (s *messageService) Send(msgs []messages.MessageRequest) (*[]messages.Messa
 	close(input)
 
 	result := <-output
+	log.Info("Messages sent")
+	for _, msg := range result {
+		log.Info(fmt.Sprintf("Content: %s, StatusCode: %d", msg.Content, msg.Code))
+	}
 
 	return &result, nil
 

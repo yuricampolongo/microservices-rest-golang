@@ -41,7 +41,6 @@ func AddMockup(mock Mock) {
 }
 
 func Post(url string, body interface{}) (*http.Response, error) {
-	fmt.Println(enabledMocks)
 	if enabledMocks {
 		mock := mocks[getMockId(http.MethodPost, url)]
 		if mock == nil {
